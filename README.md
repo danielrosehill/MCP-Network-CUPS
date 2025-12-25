@@ -1,6 +1,6 @@
-# MCP CUPS Network Printers
+# MCP-CUPS Bridge For LAN (Networked) Printers
 
-An MCP server for network printing via CUPS. Deploy on a print server to give AI assistants remote access to network printers. Supports file uploads from clients, SSE transport for remote connections, and full CUPS printer management.
+MCP server for network printing via CUPS. Deploy on a print server to give AI assistants remote access to network printers. Supports file uploads from clients, SSE transport for remote connections, and full CUPS printer management.
 
 > **Fork Note:** This is a fork of [mcp-printer](https://github.com/steveclarke/mcp-printer) by Stephen Clarke, adapted for network/remote printing scenarios. The original project focuses on local printing; this fork adds SSE transport and file upload capabilities for centralized print servers.
 
