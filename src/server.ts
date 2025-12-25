@@ -1,55 +1,47 @@
 /**
- * @fileoverview MCP Server implementation for network printing operations.
- * Provides a Model Context Protocol server that exposes printing tools via CUPS.
- * Supports both stdio and SSE transports for local and remote access.
+ * @fileoverview MCP Server for CUPS network printing.
+ * Runs as a stdio MCP server for local clients (Claude Code, etc.)
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
-import { registerAllTools } from "./tools/index.js"
+import { registerTools } from "./tools.js"
 import { config } from "./config.js"
-import { startHttpServer } from "./http-transport.js"
 import packageJson from "../package.json" with { type: "json" }
 
 /**
- * MCP Server instance for network printing via CUPS.
- * Handles printer management, print jobs, document rendering, and file uploads.
+ * MCP Server instance for CUPS network printing.
  */
 export const mcpServer = new McpServer({
-  name: "mcp-cups-network-printers",
+  name: "mcp-cups",
   version: packageJson.version,
 })
 
-// Register all tools with the server
-registerAllTools(mcpServer)
+// Register tools
+registerTools(mcpServer)
 
 /**
- * Starts the MCP Printer server with the configured transport.
- * Supports stdio (default) for local/SSH usage and SSE for remote HTTP access.
- *
- * @throws {Error} If server connection fails or unsupported OS detected
+ * Starts the MCP server with stdio transport.
  */
 export async function startServer() {
-  // Check for unsupported operating systems
+  // Check for unsupported OS
   if (process.platform === "win32") {
     throw new Error(
-      "MCP CUPS Network Printers is not supported on Windows. " +
-        "This server requires CUPS printing system, which is only available on macOS and Linux. " +
-        "Windows uses a different printing architecture that is not currently supported."
+      "MCP CUPS requires a Unix-like system with CUPS. Windows is not supported."
     )
   }
 
-  // Log platform and transport information
-  console.error(`MCP CUPS Network Printers starting on ${process.platform}...`)
-  console.error(`Transport mode: ${config.network.transport}`)
+  // Log startup info
+  const serverInfo = config.cupsServer
+    ? `CUPS server: ${config.cupsServer}:${config.cupsPort}`
+    : "CUPS server: localhost (set MCP_CUPS_SERVER to connect to a remote server)"
 
-  if (config.network.transport === "sse") {
-    // Start HTTP server with SSE transport for remote access
-    await startHttpServer(mcpServer)
-  } else {
-    // Use stdio transport (default) for local/SSH usage
-    const transport = new StdioServerTransport()
-    await mcpServer.connect(transport)
-    console.error("MCP CUPS Network Printers running on stdio")
-  }
+  console.error(`MCP CUPS starting...`)
+  console.error(serverInfo)
+
+  // Start stdio transport
+  const transport = new StdioServerTransport()
+  await mcpServer.connect(transport)
+
+  console.error("MCP CUPS running on stdio")
 }
