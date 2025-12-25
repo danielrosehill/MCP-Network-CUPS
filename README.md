@@ -2,37 +2,11 @@
 
 ![alt text](images/1.png)
 
-MCP server for network printing via CUPS. Deploy on a print server to give AI assistants remote access to network printers. Supports file uploads from clients, SSE transport for remote connections, and full CUPS printer management.
+This project is a fork of `mcp-printer` and (as distinct from the original MCP) is intended to support using MCP to send print jobs to a networked print server running CUPS as its backend. 
 
-> **Fork Note:** This is a fork of [mcp-printer](https://github.com/steveclarke/mcp-printer) by Stephen Clarke, adapted for network/remote printing scenarios. The original project focuses on local printing; this fork adds SSE transport and file upload capabilities for centralized print servers.
+Various tools are exposed to provide support for commonly required operations against network printer devices, including network printer listing, remote printing, and driver verification.
 
-## Architecture
-
-```
-┌─────────────────┐         ┌─────────────────────────────────────┐
-│  Client Desktop │         │          Print Server               │
-│                 │         │                                     │
-│  ┌───────────┐  │  HTTP   │  ┌─────────────────┐                │
-│  │ Claude    │  │  SSE    │  │ MCP CUPS        │                │
-│  │ Desktop   │──┼────────►│  │ Network Printers│                │
-│  │ or other  │  │         │  └────────┬────────┘                │
-│  │ MCP client│  │         │           │                         │
-│  └───────────┘  │         │           ▼                         │
-│                 │         │  ┌─────────────────┐    ┌─────────┐ │
-│  Files on your  │ upload  │  │      CUPS       │───►│ Network │ │
-│  local machine ─┼────────►│  │                 │    │ Printer │ │
-│                 │         │  └─────────────────┘    └─────────┘ │
-└─────────────────┘         └─────────────────────────────────────┘
-```
-
-**Key Difference from Original mcp-printer:**
-
-| Aspect | mcp-printer (original) | mcp-cups-network-printers (this fork) |
-|--------|------------------------|---------------------------------------|
-| Where MCP runs | Local machine | Remote print server |
-| Transport | stdio only | stdio + SSE (HTTP) |
-| File source | Local filesystem | Uploaded from client OR server paths |
-| Use case | Personal local printing | Shared network print service |
+This is intended as a starter code project for further development.
 
 ## Features
 
