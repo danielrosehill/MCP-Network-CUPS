@@ -1,17 +1,17 @@
 {
-  "name": "mcp-cups",
+  "name": "lan-mcp-cups",
   "version": "1.0.0",
   "description": "MCP server for printing to CUPS network printers. Discover printers, add them locally, and send print jobs from Claude Code or other MCP clients.",
   "author": "Daniel Rosehill",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/danielrosehill/mcp-cups.git"
+    "url": "https://github.com/danielrosehill/lan-mcp-cups.git"
   },
   "bugs": {
-    "url": "https://github.com/danielrosehill/mcp-cups/issues"
+    "url": "https://github.com/danielrosehill/lan-mcp-cups/issues"
   },
-  "homepage": "https://github.com/danielrosehill/mcp-cups#readme",
+  "homepage": "https://github.com/danielrosehill/lan-mcp-cups#readme",
   "keywords": [
     "mcp",
     "mcp-server",
@@ -27,7 +27,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-cups": "./dist/index.js"
+    "lan-mcp-cups": "./dist/index.js"
   },
   "files": [
     "dist",

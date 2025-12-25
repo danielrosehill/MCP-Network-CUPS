@@ -13,7 +13,7 @@ import packageJson from "../package.json" with { type: "json" }
  * MCP Server instance for CUPS network printing.
  */
 export const mcpServer = new McpServer({
-  name: "mcp-cups",
+  name: "lan-mcp-cups",
   version: packageJson.version,
 })
 
@@ -36,12 +36,12 @@ export async function startServer() {
     ? `CUPS server: ${config.cupsServer}:${config.cupsPort}`
     : "CUPS server: localhost (set MCP_CUPS_SERVER to connect to a remote server)"
 
-  console.error(`MCP CUPS starting...`)
+  console.error(`LAN MCP CUPS starting...`)
   console.error(serverInfo)
 
   // Start stdio transport
   const transport = new StdioServerTransport()
   await mcpServer.connect(transport)
 
-  console.error("MCP CUPS running on stdio")
+  console.error("LAN MCP CUPS running on stdio")
 }
