@@ -46,6 +46,22 @@ export interface Config {
     /** Line spacing for code rendering (e.g., "1.5") */
     lineSpacing: string
   }
+  /** Network transport configuration */
+  network: {
+    /** Transport mode: "stdio" (default) or "sse" for HTTP/SSE server */
+    transport: "stdio" | "sse"
+    /** HTTP port for SSE transport (default: 3847) */
+    port: number
+    /** HTTP host to bind for SSE transport (default: "0.0.0.0") */
+    host: string
+  }
+  /** Upload configuration */
+  upload: {
+    /** Maximum upload size in bytes (default: 50MB) */
+    maxSize: number
+    /** Blocked file extensions for uploads (security) */
+    blockedExtensions: string[]
+  }
 }
 
 /**
@@ -77,6 +93,15 @@ const DEFAULT_CODE_COLOR_SCHEME = "atom-one-light"
 const DEFAULT_CODE_AUTO_LINE_NUMBERS = true
 const DEFAULT_CODE_FONT_SIZE = "10pt"
 const DEFAULT_CODE_LINE_SPACING = "1.5"
+
+// Network transport defaults
+const DEFAULT_TRANSPORT = "stdio"
+const DEFAULT_PORT = 3847
+const DEFAULT_HOST = "0.0.0.0"
+
+// Upload defaults
+const DEFAULT_MAX_UPLOAD_SIZE = 52428800 // 50MB
+const DEFAULT_BLOCKED_EXTENSIONS = ["exe", "sh", "bat", "cmd", "ps1", "vbs", "js", "msi", "dll", "so"]
 
 // Get home directory for security defaults
 const homeDir = homedir()
@@ -180,6 +205,24 @@ export const config: Config = {
     }),
     fontSize: process.env.MCP_PRINTER_CODE_FONT_SIZE || DEFAULT_CODE_FONT_SIZE,
     lineSpacing: process.env.MCP_PRINTER_CODE_LINE_SPACING || DEFAULT_CODE_LINE_SPACING,
+  },
+  network: {
+    transport: (process.env.MCP_PRINTER_TRANSPORT || DEFAULT_TRANSPORT) as "stdio" | "sse",
+    port: parseInt(process.env.MCP_PRINTER_PORT || String(DEFAULT_PORT), 10),
+    host: process.env.MCP_PRINTER_HOST || DEFAULT_HOST,
+  },
+  upload: {
+    maxSize: parseInt(
+      process.env.MCP_PRINTER_MAX_UPLOAD_SIZE || String(DEFAULT_MAX_UPLOAD_SIZE),
+      10
+    ),
+    blockedExtensions: parseDelimitedString(
+      process.env.MCP_PRINTER_BLOCKED_EXTENSIONS,
+      ",",
+      (s) => s.toLowerCase()
+    ).length > 0
+      ? parseDelimitedString(process.env.MCP_PRINTER_BLOCKED_EXTENSIONS, ",", (s) => s.toLowerCase())
+      : DEFAULT_BLOCKED_EXTENSIONS,
   },
 }
 

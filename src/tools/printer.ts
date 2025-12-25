@@ -148,6 +148,119 @@ export function registerPrinterTools(server: McpServer) {
     }
   )
 
+  // get_printer_info - Get detailed printer info including driver
+  server.registerTool(
+    "get_printer_info",
+    {
+      title: "Get Printer Info",
+      description:
+        "Get detailed information about a printer including its driver, connection, and current settings.",
+      inputSchema: {
+        printer: z.string().describe("Printer name to get info for"),
+      },
+    },
+    async ({ printer }) => {
+      try {
+        // Get printer status and driver info
+        const lpstatOutput = await execCommand("lpstat", ["-l", "-p", printer])
+
+        // Get printer options/settings
+        let optionsOutput = ""
+        try {
+          optionsOutput = await execCommand("lpoptions", ["-p", printer, "-l"])
+        } catch {
+          optionsOutput = "(Could not retrieve options)"
+        }
+
+        const text = `Printer: ${printer}\n\n` +
+          `--- Status & Driver ---\n${lpstatOutput}\n\n` +
+          `--- Available Options ---\n${optionsOutput || "(No configurable options)"}`
+
+        return {
+          content: [{ type: "text", text }],
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        return {
+          content: [{ type: "text", text: `Error getting printer info: ${message}` }],
+        }
+      }
+    }
+  )
+
+  // get_printer_options - Get current settings for a printer
+  server.registerTool(
+    "get_printer_options",
+    {
+      title: "Get Printer Options",
+      description:
+        "Get the available options and current settings for a specific printer. Shows what can be configured.",
+      inputSchema: {
+        printer: z.string().describe("Printer name"),
+      },
+    },
+    async ({ printer }) => {
+      try {
+        const output = await execCommand("lpoptions", ["-p", printer, "-l"])
+        return {
+          content: [
+            {
+              type: "text",
+              text: output || `No configurable options for printer: ${printer}`,
+            },
+          ],
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        return {
+          content: [{ type: "text", text: `Error: ${message}` }],
+        }
+      }
+    }
+  )
+
+  // set_printer_options - Update printer settings (management)
+  if (config.enableManagement) {
+    server.registerTool(
+      "set_printer_options",
+      {
+        title: "Set Printer Options",
+        description:
+          "Update settings for a specific printer. Use get_printer_options first to see available options.",
+        inputSchema: {
+          printer: z.string().describe("Printer name"),
+          options: z
+            .array(z.string())
+            .describe(
+              "Array of options to set (e.g., ['PageSize=A4', 'Duplex=DuplexNoTumble'])"
+            ),
+        },
+      },
+      async ({ printer, options }) => {
+        try {
+          const args = ["-p", printer]
+          for (const opt of options) {
+            args.push("-o", opt)
+          }
+          await execa("lpoptions", args)
+          return {
+            content: [
+              {
+                type: "text",
+                text: `✓ Updated ${printer} with options: ${options.join(", ")}`,
+              },
+            ],
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error)
+          return {
+            content: [{ type: "text", text: `Error updating printer: ${message}` }],
+          }
+        }
+      }
+    )
+  }
+
   // cancel_print_job - Only register if management is enabled
   if (config.enableManagement) {
     server.registerTool(
