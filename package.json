@@ -1,7 +1,7 @@
 {
   "name": "lan-mcp-cups",
-  "version": "1.0.0",
-  "description": "MCP server for printing to CUPS network printers. Discover printers, add them locally, and send print jobs from Claude Code or other MCP clients.",
+  "version": "1.1.0",
+  "description": "MCP server for printing to CUPS network printers via streamable HTTP. Discover printers, add them locally, and send print jobs from Claude Code or other MCP clients.",
   "author": "Daniel Rosehill",
   "license": "MIT",
   "repository": {
@@ -16,6 +16,7 @@
     "mcp",
     "mcp-server",
     "model-context-protocol",
+    "streamable-http",
     "printer",
     "printing",
     "cups",

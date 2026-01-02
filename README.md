@@ -2,7 +2,12 @@
 
 ![LAN MCP CUPS](images/1.png)
 
-An MCP server for printing to CUPS network printers. Discover printers on a network print server, add them to your local system, and send print jobs directly from Claude Code or other MCP clients.
+An MCP server for printing to CUPS network printers via **streamable HTTP**. Discover printers on a network print server, add them to your local system, and send print jobs directly from Claude Code or other MCP clients.
+
+## Transport Modes
+
+- **HTTP** (default): Runs as an HTTP server at `http://127.0.0.1:3000/mcp`
+- **Stdio** (legacy): For clients that spawn the process directly
 
 ## Use Cases
 
@@ -50,7 +55,29 @@ MCP_CUPS_SERVER=print-server.local lan-mcp-cups
 
 ## Claude Code Configuration
 
-Add to your Claude Code settings (`~/.claude/settings.json`):
+### Streamable HTTP (Recommended)
+
+Start the server first:
+
+```bash
+MCP_CUPS_SERVER=print-server.local npx lan-mcp-cups
+```
+
+Then add to your Claude Code settings (`~/.claude/settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "cups": {
+      "url": "http://127.0.0.1:3000/mcp"
+    }
+  }
+}
+```
+
+### Stdio Mode (Legacy)
+
+For clients that don't support HTTP transport:
 
 ```json
 {
@@ -59,7 +86,8 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
       "command": "npx",
       "args": ["lan-mcp-cups"],
       "env": {
-        "MCP_CUPS_SERVER": "print-server.local"
+        "MCP_CUPS_SERVER": "print-server.local",
+        "MCP_CUPS_TRANSPORT": "stdio"
       }
     }
   }
@@ -68,26 +96,9 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 Replace `print-server.local` with your CUPS server hostname or IP address.
 
-### Optional Settings
-
-```json
-{
-  "mcpServers": {
-    "cups": {
-      "command": "npx",
-      "args": ["lan-mcp-cups"],
-      "env": {
-        "MCP_CUPS_SERVER": "192.168.1.100",
-        "MCP_CUPS_PORT": "631",
-        "MCP_CUPS_DEFAULT_PRINTER": "HP_LaserJet",
-        "MCP_CUPS_MAX_COPIES": "20"
-      }
-    }
-  }
-}
-```
-
 ## Environment Variables
+
+### CUPS Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -95,6 +106,14 @@ Replace `print-server.local` with your CUPS server hostname or IP address.
 | `MCP_CUPS_PORT` | `631` | CUPS server port |
 | `MCP_CUPS_DEFAULT_PRINTER` | _(none)_ | Default printer name |
 | `MCP_CUPS_MAX_COPIES` | `10` | Maximum copies per job (0 = unlimited) |
+
+### Transport Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MCP_CUPS_TRANSPORT` | `http` | Transport mode: `http` or `stdio` |
+| `MCP_CUPS_HTTP_HOST` | `127.0.0.1` | HTTP server bind address |
+| `MCP_CUPS_HTTP_PORT` | `3000` | HTTP server port |
 
 ## Tools
 
